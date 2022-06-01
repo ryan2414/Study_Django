@@ -1,5 +1,6 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from .models import Photo
+from .forms import PhotoForm
 
 # Create your views here.
 
@@ -12,3 +13,15 @@ def photo_list(request):
 def photo_detail(request, pk):
     photo = get_object_or_404(Photo, pk=pk)
     return render(request, 'photo/photo_detail.html', {'photo': photo})
+
+
+def photo_post(request):
+    if request.method == "POST":
+        form = PhotoForm(request.POST)
+        if form.is_valid():
+            photo = form.save(commit=False)
+            photo.save()
+            return redirect('photo_detail', pk=photo.pk)
+    else:
+        form = PhotoForm()
+    return render(request, 'photo/photo_post.html', {'form': form})
